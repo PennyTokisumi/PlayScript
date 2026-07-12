@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Test data (large binary PNGs)
+pics/
+
+# Runtime capture cache
+.capture/
+.capture_*.png
+.capture_*.jpg
+
+# Generated output
+台本.txt
+台本.docx
+台本_*.txt
+台本_*.docx
+frames.json
+
+# Debug artifacts
+ps_debug.log
+_diag*
+*_crop.png
+*_full.png
+
+# Temp directories
+.tmp_docx/
+.ocrout/
+.exp/
+.view/
+.dbg/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
