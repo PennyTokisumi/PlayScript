@@ -7,11 +7,18 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const { ocr } = require('../src/ocr/ocr');
-const { parseFrame } = require('../src/parse/parse');
-const { buildRows } = require('../src/pipeline');
-const { toText } = require('../src/output/text');
-const { writeDocx } = require('../src/docx/docx');
+// 从 HTML 页面路径推导扩展根目录（最稳，不依赖 __dirname 或 CEP API 偏差）
+var EXTDIR = decodeURI(window.location.href.replace(/\/[^\/]*$/, ''));
+// 去掉 Windows file:// 前缀
+if (/^file:\/\/\//.test(EXTDIR)) EXTDIR = EXTDIR.replace(/^file:\/\/\//, '');
+else EXTDIR = EXTDIR.replace(/^file:\/\//, '');
+const SRCDIR = path.join(EXTDIR, 'src');
+
+const { ocr } = require(path.join(SRCDIR, 'ocr/ocr'));
+const { parseFrame } = require(path.join(SRCDIR, 'parse/parse'));
+const { buildRows } = require(path.join(SRCDIR, 'pipeline'));
+const { toText } = require(path.join(SRCDIR, 'output/text'));
+const { writeDocx } = require(path.join(SRCDIR, 'docx/docx'));
 
 /** 字幕颜色，默认白色，可手动输入 hex 或点击缩略图取色 */
 let pickedColor = '#FFFFFF';
@@ -88,7 +95,7 @@ function scanCaptureDir() {
         try { fs.unlinkSync(cropPath); } catch (_) {}
 
         // 裁切图里不设 y 过滤：取所有非"说明"的含冒号行，最下一条即为台词
-        var fixOcr = require('../src/parse/ocrfix').fixOcr;
+        var fixOcr = require(path.join(SRCDIR, 'parse/ocrfix')).fixOcr;
         var cropLines = (detail.lines || []).map(function (l) { return { clean: l.text.replace(/\s+/g, ''), y: l.y }; });
         var dlgCand = cropLines.filter(function (l) {
           return /[:：·]/.test(l.clean) && !/^说\s*明[:：]/.test(l.clean);
@@ -256,5 +263,5 @@ $('colorHex').oninput = function () {
   var ffOk = true;
   try { require('child_process').execFileSync('ffmpeg', ['-version'], { stdio: 'ignore', windowsHide: true, timeout: 5000 }); }
   catch (_) { ffOk = false; }
-  setStatus('ezPlayScript v1.0 · Ctrl+Shift+E → 桌面 .ezCapture' + (ffOk ? '' : ' ⚠ ffmpeg 未找到'), ffOk ? 'ok' : 'warn');
+  setStatus('ezPlayScript v1.1 · Ctrl+Shift+E → 桌面 .ezCapture' + (ffOk ? '' : ' ⚠ ffmpeg 未找到'), ffOk ? 'ok' : 'warn');
 })();
